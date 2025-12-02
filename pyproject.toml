@@ -3,8 +3,8 @@ requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "plg-sdk"
-version = "0.0.1"
+name = "pylovegmod-sdk"
+version = "0.0.1a1"
 description = "Project, build and dependency manager for the PLG ecosystem, orchestrating tools"
 readme = "README.md"
 license = { file = "LICENSE" }
