@@ -32,11 +32,6 @@
                 "default": ".",
                 "desc": "Корневая директория проекта, относительно которой plg-sdk выполняет все операции"
             },
-            "cache_dir": {
-                "type": "path",
-                "default": "./.plg_cache",
-                "desc": "Путь и название папки кеша plg-sdk"
-            },
             "source_dir": {
                 "type": "path",
                 "default": "./source",
