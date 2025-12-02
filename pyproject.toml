@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plg-sdk"
+version = "0.0.1"
+description = "Project, build and dependency manager for the PLG ecosystem, orchestrating tools"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.13"
+authors = [{ name = "Cain" }]
+dependencies = ["colorama"]
+
+[project.scripts]
+plg-sdk = "plg_sdk.cli.main:main"
+
+[project.urls]
+homepage = "https://github.com/py-love-gmod/plg-sdk"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v"

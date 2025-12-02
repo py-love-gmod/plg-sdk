@@ -1,0 +1,95 @@
+{
+    "types": {
+        "str": "Принимает строковое значение",
+        "bool": "Принимает bool значение",
+        "path": "Принимает путь или строку пути",
+        "array_str": "Принимает список строковых значений"
+    },
+    "allowed_modules": [
+        "py2glua"
+    ],
+    "config": {
+        "plg-sdk": {
+            "debug": {
+                "type": "bool",
+                "default": false,
+                "desc": "Включает подробные логи и режим отладки для всех операций"
+            },
+            "auto_install": {
+                "type": "bool",
+                "default": true,
+                "desc": "Автоматически устанавливает недостающие инструменты экосистемы plg-sdk"
+            },
+            "auto_update": {
+                "type": "bool",
+                "default": true,
+                "desc": "Разрешает автоматически обновлять зависимости plg-sdk\nЗависимости проверяют свою версию перед запуском всегда\nНе рекомендуется выключать данный параметр"
+            }
+        },
+        "paths": {
+            "cwd_path": {
+                "type": "path",
+                "default": ".",
+                "desc": "Корневая директория проекта, относительно которой plg-sdk выполняет все операции"
+            },
+            "cache_dir": {
+                "type": "path",
+                "default": "./.plg_cache",
+                "desc": "Путь и название папки кеша plg-sdk"
+            },
+            "source_dir": {
+                "type": "path",
+                "default": "./source",
+                "desc": "Папка с исходниками по умолчанию, если модули не переопределяют свои пути"
+            },
+            "out_dir": {
+                "type": "path",
+                "default": "./build",
+                "desc": "Папка для выходных данных по умолчанию, если модули не переопределяют свои пути"
+            }
+        },
+        "project": {
+            "name": {
+                "type": "str",
+                "default": "%!NOT_SET!%",
+                "desc": "Имя аддона"
+            },
+            "author": {
+                "type": "str",
+                "default": "%!NOT_SET!%",
+                "desc": "Имя автора"
+            },
+            "namespace": {
+                "type": "str",
+                "default": "%!DEFAULT!%",
+                "desc": "Уникальный неймспейс проекта\nИспользуется некоторыми модулями для формирования уникальных имён\nДолжен быть валидным идентификатором: [A-Za-z0-9_]+\nЗначение по умолчанию: project.name + \"_\" + project.author"
+            },
+            "version": {
+                "type": "str",
+                "default": "%!NOT_SET!%",
+                "desc": "Версия аддона\nСледуйте спецификации PEP по версиям\nhttps://peps.python.org/pep-0440/"
+            }
+        },
+        "build": {
+            "parallel": {
+                "type": "bool",
+                "default": true,
+                "desc": "Включает паралельную сборку там, где это возможно и уместно"
+            },
+            "clean_before": {
+                "type": "bool",
+                "default": true,
+                "desc": "Очищает out_dir перед новой сборкой"
+            }
+        },
+        "modules": {
+            "allowed": {
+                "type": "array_str",
+                "default": [
+                    "all"
+                ],
+                "desc": "Список модулей, которые разрешены для использования\nСписок доступных на момент версии {VERSION}:\n{ALLOWED_MODULES}"
+            }
+        }
+    }
+}
