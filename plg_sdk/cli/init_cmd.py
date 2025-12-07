@@ -1,7 +1,8 @@
-import json
 import logging
 from pathlib import Path
 from typing import Any
+
+from ..core import Config
 
 logger = logging.getLogger("plg-sdk")
 
@@ -15,7 +16,11 @@ def _to_toml_value(v: Any) -> str:
         return str(v)
 
     if isinstance(v, Path):
-        return f'"{v.as_posix()}"'
+        s = v.as_posix()
+        if not v.is_absolute() and not s.startswith("./"):
+            s = "./" + s
+
+        return f'"{s}"'
 
     if isinstance(v, str):
         return f'"{v}"'
@@ -77,40 +82,87 @@ class _TomlFile:
             self._order.append(name)
 
     def add_config(
-        self, header: str, name: str, default: Any, desc: str, input_desc: str
+        self,
+        header: str,
+        name: str,
+        default: Any,
+        desc: str,
+        input_desc: str,
+        no_comments: bool = False,
     ):
         if header not in self._sections:
             self.add_header(header)
 
         block = []
-        for line in desc.strip().split("\n"):
-            block.append(f"# {line}")
 
-        block.append(f"# {input_desc}")
+        if not no_comments:
+            for line in desc.strip().split("\n"):
+                block.append(f"# {line}")
+
+            block.append(f"# {input_desc}")
+
         block.append(f"{name} = {_to_toml_value(default)}")
 
         self._sections[header].append(block)
 
-    def dump(self, path: str | Path = "plg-sdk-config.toml"):
-        p = Path(path)
+    def dump(self):
+        config_path = Config.config_file()
 
-        with p.open("w", encoding="utf8") as f:
+        with config_path.open("w", encoding="utf8") as f:
+            first_section = True
+
             for header in self._order:
-                f.write(f"[{header}]\n")
-                for block in self._sections[header]:
-                    for line in block:
-                        f.write(line + "\n")
+                if not first_section:
                     f.write("\n")
+
+                first_section = False
+                f.write(f"[{header}]\n")
+                blocks = self._sections[header]
+
+                section_has_comments = any(len(block) > 1 for block in blocks)
+
+                if not section_has_comments:
+                    keys = []
+                    for block in blocks:
+                        kv = block[-1]
+                        key = kv.split("=")[0].strip()
+                        keys.append(key)
+
+                    max_key_len = max(len(k) for k in keys)
+
+                for i, block in enumerate(blocks):
+                    if section_has_comments:
+                        for line in block[:-1]:
+                            f.write(line + "\n")
+
+                        f.write(block[-1] + "\n")
+                        if i != len(blocks) - 1:
+                            f.write("\n")
+
+                    else:
+                        kv = block[-1]
+                        key, value = kv.split("=", 1)
+                        key = key.strip()
+                        value = value.strip()
+
+                        pad = " " * (max_key_len - len(key))  # pyright: ignore[reportPossiblyUnboundVariable]
+                        f.write(f"{key}{pad} = {value}\n")
 
 
 # endregion
 
 
-def init_cmd(version: str) -> None:
-    schema_path = Path(__file__).parents[1] / "resource/config_schema.json"
+def init_cmd(version: str, no_comments: bool = False) -> None:
+    if Config.config_file().exists():
+        inp = (
+            input("\nФайл plg-sdk-config.toml уже существует.\nПерезаписать? (y/n) ")
+            .strip()
+            .lower()
+        )
+        if inp not in ("y", "yes"):
+            return
 
-    with schema_path.open("r", encoding="utf8") as f:
-        schema = json.load(f)
+    schema = Config.load_config_schema()
 
     type_descriptions = schema["types"]
     allowed_modules: list[str] = schema["allowed_modules"]
@@ -139,6 +191,7 @@ def init_cmd(version: str) -> None:
                 cast_default,
                 desc,
                 type_descriptions[input_type],
+                no_comments,
             )
 
     file.dump()

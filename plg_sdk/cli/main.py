@@ -5,6 +5,7 @@ from importlib.metadata import PackageNotFoundError, version
 
 from colorama import Fore, Style, init
 
+from ..core import Config, ConfigValidator
 from .init_cmd import init_cmd
 
 init(autoreset=True)
@@ -76,14 +77,24 @@ def _build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     # region init cmd
-    sub.add_parser(
+    init_cmd = sub.add_parser(
         "init",
         help="Выплёвывает базовый объект plg-sdk-config.toml в текущую деррикторию",
+    )
+    init_cmd.add_argument(
+        "-n",
+        "--no-comments",
+        action="store_true",
+        help="Убирает комментарии из toml файла при генерации",
     )
     # endregion
 
     # region Version cmd
     sub.add_parser("version", help="Показывает версию plg-sdk")
+    # endregion
+
+    # region config-validate
+    sub.add_parser("config-validate", help="Вызывает только валидацию конфига")
     # endregion
 
     return parser
@@ -92,17 +103,55 @@ def _build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
-    logger.setLevel(logging.DEBUG if args.debug else logging.INFO)
+    Config.init()
 
-    logger.debug(f"plg-sdk\nVersion: {_verison()}")
+    if args.debug:
+        Config.set("config.plg-sdk.debug", True)
+
+    logger.setLevel(
+        logging.DEBUG if Config.get("config.plg-sdk.debug", False) else logging.INFO
+    )
+    logger.debug(
+        "plg-sdk\n"
+        f"Version     : {_verison()}\n"
+        f"DataPath    : {Config.sdk_path()}\n"
+        f"ConfigFile  : {Config.config_file()}\n"
+        f"ResourcePath: {Config.resource_path()}"
+    )
 
     try:
-        if args.cmd == "init":
-            init_cmd(_verison())
+        match args.cmd:
+            case "init":
+                init_cmd(_verison(), args.no_comments)
 
-        elif args.cmd == "version":
-            print(_verison())
+            case "version":
+                print(_verison())
 
+            case "config-validate":
+                ConfigValidator.validate()
+                for war_log in ConfigValidator.warnings():
+                    logger.warning(war_log)
+
+                for err_log in ConfigValidator.errors():
+                    logger.error(err_log)
+
+                if ConfigValidator.errors():
+                    logger.error("Exit code 1")
+                    sys.exit(1)
+
+                if ConfigValidator.warnings():
+                    logger.warning("Конфиг рабочий, но есть предупреждения")
+
+                else:
+                    logger.info("Всё в порядке\nOwO")
+
+            case _:
+                pass
+
+        sys.exit(0)
+
+    except KeyboardInterrupt:
+        logger.debug("Пользователь самостоятельно прервал выполнение программы")
         sys.exit(0)
 
     except Exception as err:

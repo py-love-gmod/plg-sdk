@@ -52,9 +52,15 @@ class ModuleManager:
     @classmethod
     def update_install_modules(cls, modules: set[str]) -> None:
         try:
-            subprocess.run([sys.executable, "-m", "pip", "install", "-U", *modules])
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", "-U", *modules],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
 
-        except Exception:
+        except Exception as err:
+            logger.debug(f"pip install для модулей {modules} не удался\n{err}")
             return
 
         cls._modules.update(modules)
@@ -66,7 +72,9 @@ class ModuleManager:
         def _thread_func(module):
             return module, cls._get_version_via_pip_api(module)
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+        with concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(4, len(cls._modules))
+        ) as pool:
             futures = [pool.submit(_thread_func, module) for module in cls._modules]
             for future in concurrent.futures.as_completed(futures):
                 module, version = future.result()

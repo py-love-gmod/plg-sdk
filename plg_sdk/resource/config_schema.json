@@ -9,7 +9,7 @@
         "py2glua"
     ],
     "config": {
-        "plg-sdk": {
+        "PLG-SDK": {
             "debug": {
                 "type": "bool",
                 "default": false,
@@ -26,12 +26,7 @@
                 "desc": "Разрешает автоматически обновлять зависимости plg-sdk\nЗависимости проверяют свою версию перед запуском всегда\nНе рекомендуется выключать данный параметр"
             }
         },
-        "paths": {
-            "cwd_path": {
-                "type": "path",
-                "default": ".",
-                "desc": "Корневая директория проекта, относительно которой plg-sdk выполняет все операции"
-            },
+        "PATHS": {
             "source_dir": {
                 "type": "path",
                 "default": "./source",
@@ -43,7 +38,7 @@
                 "desc": "Папка для выходных данных по умолчанию, если модули не переопределяют свои пути"
             }
         },
-        "project": {
+        "PROJECT": {
             "name": {
                 "type": "str",
                 "default": "%!NOT_SET!%",
@@ -65,7 +60,7 @@
                 "desc": "Версия аддона\nСледуйте спецификации PEP по версиям\nhttps://peps.python.org/pep-0440/"
             }
         },
-        "build": {
+        "BUILD": {
             "parallel": {
                 "type": "bool",
                 "default": true,
@@ -77,7 +72,7 @@
                 "desc": "Очищает out_dir перед новой сборкой"
             }
         },
-        "modules": {
+        "MODULES": {
             "allowed": {
                 "type": "array_str",
                 "default": [
