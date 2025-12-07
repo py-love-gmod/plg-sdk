@@ -94,10 +94,30 @@ def _build_parser() -> argparse.ArgumentParser:
     # endregion
 
     # region config-validate
-    sub.add_parser("config-validate", help="Вызывает только валидацию конфига")
+    sub.add_parser("config-validate", help="Вызывает валидацию конфига")
     # endregion
 
     return parser
+
+
+def _validate_config(final_msg: bool = False) -> None:
+    ConfigValidator.validate()
+    for war_log in ConfigValidator.warnings():
+        logger.warning(war_log)
+
+    for err_log in ConfigValidator.errors():
+        logger.error(err_log)
+
+    if ConfigValidator.errors():
+        logger.error("Exit code 1")
+        sys.exit(1)
+
+    if final_msg:
+        if ConfigValidator.warnings():
+            logger.warning("Файл конфигурации верный, но есть предупреждения")
+
+        else:
+            logger.info("Всё в порядке\nOwO")
 
 
 def main() -> None:
@@ -128,22 +148,7 @@ def main() -> None:
                 print(_verison())
 
             case "config-validate":
-                ConfigValidator.validate()
-                for war_log in ConfigValidator.warnings():
-                    logger.warning(war_log)
-
-                for err_log in ConfigValidator.errors():
-                    logger.error(err_log)
-
-                if ConfigValidator.errors():
-                    logger.error("Exit code 1")
-                    sys.exit(1)
-
-                if ConfigValidator.warnings():
-                    logger.warning("Конфиг рабочий, но есть предупреждения")
-
-                else:
-                    logger.info("Всё в порядке\nOwO")
+                _validate_config(True)
 
             case _:
                 pass
