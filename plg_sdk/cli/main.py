@@ -6,6 +6,7 @@ from importlib.metadata import PackageNotFoundError, version
 from colorama import Fore, Style, init
 
 from ..core import Config, ConfigValidator
+from .build_cmd import build_cmd
 from .init_cmd import init_cmd
 
 init(autoreset=True)
@@ -79,7 +80,7 @@ def _build_parser() -> argparse.ArgumentParser:
     # region init cmd
     init_cmd = sub.add_parser(
         "init",
-        help="Выплёвывает базовый объект plg-sdk-config.toml в текущую деррикторию",
+        help="Создаёт дефолтный plg-sdk-config.toml",
     )
     init_cmd.add_argument(
         "-n",
@@ -95,6 +96,10 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # region config-validate
     sub.add_parser("config-validate", help="Вызывает валидацию конфига")
+    # endregion
+
+    # region build
+    sub.add_parser("build", help="Запускает сборку аддона")
     # endregion
 
     return parser
@@ -149,6 +154,10 @@ def main() -> None:
 
             case "config-validate":
                 _validate_config(True)
+
+            case "build":
+                _validate_config()
+                build_cmd()
 
             case _:
                 pass

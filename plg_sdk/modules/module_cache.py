@@ -17,7 +17,7 @@ class ModulesCache:
 
     # BODY (repeat modules_len):
     #   uint16 LE  name_len
-    #   uint16 LE  version_len (0 = no version)
+    #   uint16 LE  version_len (0 = None)
     #   bytes      name
     #   bytes      version
 
