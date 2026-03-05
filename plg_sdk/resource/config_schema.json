@@ -80,6 +80,30 @@
                 ],
                 "desc": "Список модулей, которые разрешены для использования\nСписок доступных на момент версии {VERSION}:\n{ALLOWED_MODULES}"
             }
+        },
+        "WORKSHOP": {
+            "id": {
+                "type": "str",
+                "default": "%!NOT_SET!%",
+                "desc": "Указывает айди предмета для выгрузки в мастерскую стим"
+            },
+            "addon_type": {
+                "type": "str",
+                "default": "ServerContent",
+                "desc": "Тип аддона. Доступно:\ngamemode - Режим игры\nmap - Карта\nweapon - Оружие\nvehicle - Транспорт\nnpc - Неигровой персонаж\ntool - Инструмент\nentity - Энтити\neffects - Эффекты\nmodel - Модель\nServerContent - Контент сервера"
+            },
+            "tags": {
+                "type": "array_str",
+                "default": [
+                    "fun"
+                ],
+                "desc": "Метки аддонов. Максимум 3\nДоступно:\nfun - Развлечение\nroleplay - Ролевая игра\nscenic - Сценическое\nmovie - Фильм\nrealism - Реализм\ncartoon - Мультфильм\nwater - Вода\ncomic - Комикс\nbuild - Стройка"
+            },
+            "ignore": {
+                "type": "array_str",
+                "default": [],
+                "desc": "Список glob-паттернов для исключения файлов из сборки (.git/*, *.psd, *.blend и т.д.)"
+            }
         }
     }
 }

@@ -63,7 +63,7 @@ def _verison() -> str:
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="plg-sdk",
-        description="Оркестровый инстурмент для всех утилит python love gmod",
+        description="Оркестровый инструмент для всех утилит python love gmod",
     )
 
     # region Main args
@@ -87,6 +87,12 @@ def _build_parser() -> argparse.ArgumentParser:
         "--no-comments",
         action="store_true",
         help="Убирает комментарии из toml файла при генерации",
+    )
+    init_cmd.add_argument(
+        "-f",
+        "--force",
+        action="store_true",
+        help="Перезаписывает файл насильно если таковой имеется",
     )
     # endregion
 
@@ -147,7 +153,7 @@ def main() -> None:
     try:
         match args.cmd:
             case "init":
-                init_cmd(_verison(), args.no_comments)
+                init_cmd(_verison(), args.no_comments, args.force)
 
             case "version":
                 print(_verison())

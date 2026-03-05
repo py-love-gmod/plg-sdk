@@ -1,6 +1,7 @@
 import json
 import re
 import tomllib
+from functools import cache
 from pathlib import Path
 from typing import Any
 
@@ -19,7 +20,7 @@ class ConfigValidator:
         cls._warnings = []
 
         # MODULES.allowed
-        allowed = list(Config.get("config.modules.allowed", []))  # pyright: ignore[reportArgumentType]
+        allowed = Config.get("config.modules.allowed") or []
         all_modules = list(Config.get("all_modules", []))  # pyright: ignore[reportArgumentType]
 
         if "all" not in allowed:
@@ -100,7 +101,11 @@ class Config:
         if isinstance(key, str):
             return key.split(".")
 
-        return [key]
+        elif isinstance(key, list):
+            return key
+
+        else:
+            return [key]
 
     @classmethod
     def get(cls, key: str, default=None):
@@ -147,6 +152,7 @@ class Config:
         return (Path(__file__).parents[1] / "resource").resolve()
 
     @classmethod
+    @cache
     def load_config_schema(cls) -> dict[str, Any]:
         return json.loads(
             (Path(__file__).parents[1] / "resource/config_schema.json")
@@ -167,7 +173,13 @@ class Config:
                 return str(data)
 
             case "bool":
-                return bool(data)
+                if isinstance(data, bool):
+                    return data
+
+                if isinstance(data, str):
+                    return data.lower() == "true"
+
+                raise TypeError("Invalid bool")
 
             case "path":
                 return Path(data)

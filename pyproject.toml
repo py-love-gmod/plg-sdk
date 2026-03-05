@@ -21,6 +21,9 @@ homepage = "https://github.com/py-love-gmod/plg-sdk"
 [tool.setuptools.packages.find]
 where = ["."]
 
+[tool.setuptools.package-data]
+plg_sdk = ["resource/*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]

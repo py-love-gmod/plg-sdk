@@ -1,3 +1,4 @@
+import json
 import logging
 from pathlib import Path
 from typing import Any
@@ -23,7 +24,7 @@ def _to_toml_value(v: Any) -> str:
         return f'"{s}"'
 
     if isinstance(v, str):
-        return f'"{v}"'
+        return json.dumps(v)
 
     if isinstance(v, (list, tuple)):
         inner = ", ".join(_to_toml_value(x) for x in v)
@@ -152,15 +153,21 @@ class _TomlFile:
 # endregion
 
 
-def init_cmd(version: str, no_comments: bool = False) -> None:
+def init_cmd(version: str, no_comments: bool = False, force: bool = False) -> None:
     if Config.config_file().exists():
-        inp = (
-            input("\nФайл plg-sdk-config.toml уже существует.\nПерезаписать? (y/n) ")
-            .strip()
-            .lower()
-        )
-        if inp not in ("y", "yes"):
-            return
+        if not force:
+            inp = (
+                input(
+                    "\nФайл plg-sdk-config.toml уже существует.\nПерезаписать? (y/n) "
+                )
+                .strip()
+                .lower()
+            )
+            if inp not in ("y", "yes"):
+                return
+
+        else:
+            logger.warning("Файл plg-sdk-config.toml перезаписан")
 
     schema = Config.load_config_schema()
 
@@ -195,3 +202,4 @@ def init_cmd(version: str, no_comments: bool = False) -> None:
             )
 
     file.dump()
+    logger.info("Создан файл plg-sdk-config.toml")
