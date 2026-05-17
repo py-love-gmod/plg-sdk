@@ -1,1 +1,5 @@
-from .config import Config, ConfigValidator
+from .config import Config
+
+__all__ = [
+    "Config",
+]
