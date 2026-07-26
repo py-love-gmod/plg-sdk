@@ -1,2 +1,2 @@
 colorama
-pylovegmod-reader
+pylovegmod-shared
